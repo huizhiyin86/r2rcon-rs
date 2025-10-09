@@ -1,4 +1,4 @@
-use bindings::{EngineFunctions, ENGINE_FUNCTIONS};
+use bindings::{ENGINE_FUNCTIONS, EngineFunctions};
 use console_hook::{hook_console_print, hook_write_console};
 use parking_lot::Mutex;
 use rcon::RconServer;
