@@ -6,7 +6,7 @@ use crate::{
 };
 use retour::static_detour;
 use std::{
-    ffi::{c_char, c_void, CStr},
+    ffi::{CStr, c_char, c_void},
     mem::transmute,
 };
 use windows_sys::Win32::{
@@ -28,8 +28,8 @@ pub fn hook_write_console() {
             return;
         }
 
-        let kernel32 = GetModuleHandleA("kernel32.dll\0".as_ptr());
-        let write_console = transmute(GetProcAddress(kernel32, "WriteConsoleA\0".as_ptr()));
+        let kernel32 = GetModuleHandleA(c"kernel32.dll".as_ptr().cast());
+        let write_console = transmute(GetProcAddress(kernel32, c"WriteConsoleA".as_ptr().cast()));
 
         if let Err(err) = HookWriteConsoleA.initialize(write_console, write_console_hook) {
             log::error!("couldn't hook WriteConsoleA: {err}");
@@ -51,16 +51,20 @@ pub fn hook_console_print(addr: isize) -> Option<()> {
 
         // let addr = GetModuleHandleA("client.dll\0".as_ptr());
         let create_interface: CreateInterface =
-            match GetProcAddress(addr, "CreateInterface\0".as_ptr()) {
+            match GetProcAddress(addr, c"CreateInterface".as_ptr().cast()) {
                 Some(f) => transmute(f),
-                None => return Some(log::error!("couldn't get CreateInterface")),
+                None => {
+                    log::error!("couldn't get CreateInterface");
+                    return Some(());
+                }
             };
         let cgame_console: &CGameConsole =
-            match create_interface("GameConsole004\0".as_ptr() as *const i8, std::ptr::null())
-                .as_ref()
-            {
+            match create_interface(c"GameConsole004".as_ptr(), std::ptr::null()).as_ref() {
                 Some(c) => transmute(c),
-                None => return Some(log::error!("couldn't get GameConsole004")),
+                None => {
+                    log::error!("couldn't get GameConsole004");
+                    return Some(());
+                }
             };
 
         #[allow(clippy::while_immutable_condition)] // edited by other threads
@@ -85,7 +89,7 @@ pub fn hook_console_print(addr: isize) -> Option<()> {
 }
 
 unsafe fn log_if_null<'a, T: std::fmt::Debug>(ptr: *const T, msg: &str) -> Option<&'a T> {
-    match ptr.as_ref() {
+    match unsafe { ptr.as_ref() } {
         Some(t) => Some(t),
         None => {
             log::error!("{msg} is null");
