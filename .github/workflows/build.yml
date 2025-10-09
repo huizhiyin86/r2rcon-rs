@@ -27,7 +27,7 @@ jobs:
           toolchain: nightly
       - name: Build
         run: |
-          cargo build --release --verbose --target x86_64-pc-windows-msvc 
+          cargo build --release --verbose --target x86_64-pc-windows-msvc -p r2rcon-rs 
       - name: Extract Short Commit Hash
         id: extract
         shell: bash

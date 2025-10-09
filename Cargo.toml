@@ -1,18 +1,10 @@
-[package]
-name = "r2rcon-rs"
-version = "0.2.0"
-edition = "2021"
+[workspace]
+resolver = "3"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+members = [
+  "r2rcon-rs", "shared", "rcon-shell", "not-transponder"
+]
 
-[dependencies]
-rrplug = { git = "https://github.com/R2NorthstarTools/rrplug.git", version = "4.1.0" }
-once_cell = "1.*"
-log = "0.4.*"
-parking_lot = "0.12.*"
-thiserror = "2.*"
-retour = { version = "0.3.*", features = ["static-detour"] }
-windows-sys = { version = "0.48.*", features = ["Win32_System_LibraryLoader", "Win32_Foundation", "Win32_System_Console"] }
-
-[lib]
-crate-type = ["cdylib"]
+[workspace.dependencies]
+shared = { path = "shared" }
+itertools = "0.14.*"

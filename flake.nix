@@ -35,6 +35,7 @@
             libc = "msvcrt";
           };
         };
+        toolchain-win = (pkgs.pkgsBuildHost.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml);
       in
       {
         formatter = native-pkgs.nixfmt-rfc-style;
@@ -47,6 +48,7 @@
 
         devShell = pkgs.mkShell rec {
           nativeBuildInputs = with pkgs; [
+            toolchain-win
             pkg-config
           ];
 
